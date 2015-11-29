@@ -17,7 +17,7 @@ Note: This skeleton file can be safely removed if not needed!
 """
 from __future__ import division, print_function, absolute_import
 
-import argparse
+import click
 import sys
 import logging
 
@@ -30,33 +30,7 @@ __license__ = "none"
 _logger = logging.getLogger(__name__)
 
 
-def parse_args(args):
-    """
-    Parse command line parameters
+@click.command()
+def cli():
+    click.echo('Run watchman')
 
-    :param args: command line parameters as list of strings
-    :return: command line parameters as :obj:`argparse.Namespace`
-    """
-    parser = argparse.ArgumentParser(
-        description="Just a Hello World demonstration")
-    parser.add_argument(
-        '-v',
-        '--version',
-        action='version',
-        version='watchman {ver}'.format(ver=__version__))
-    return parser.parse_args(args)
-
-
-def main(args):
-    args = parse_args(args)
-    print("Hello World!")
-    _logger.info("Script ends here")
-
-
-def run():
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    main(sys.argv[1:])
-
-
-if __name__ == "__main__":
-    run()
