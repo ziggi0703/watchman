@@ -49,6 +49,7 @@ class Watchman(object):
 
         if len(own_alerts) > 0:
             alerts.append(own_alerts)
+        _logger.debug('Watch ends with {} alerts'.format(len(own_alerts)))
 
     @abstractmethod
     def _check_output(self, return_code, out, error):

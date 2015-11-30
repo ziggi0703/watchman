@@ -28,7 +28,7 @@ def cli(config):
         _formatter = logging.Formatter(fmt='[%(asctime)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         _handler.setFormatter(_formatter)
         _logger.addHandler(_handler)
-        _logger.setLevel(logging.DEBUG)
+        _logger.setLevel(logging.WARNING)
 
         _logger.info('Start watchman')
 
@@ -42,7 +42,6 @@ def cli(config):
                 config = eval(config_file.read())
 
         _logger.info('Config: {}'.format(config))
-    #    with daemon.DaemonContext(files_preserve=[_handler.stream]):
         _logger.debug('Start ping guards')
         ping_guards = [PingGuard('PingGuard {}'.format(index), host=hostname)
                        for index, hostname in enumerate(config['hosts'])]
@@ -56,4 +55,4 @@ def cli(config):
             if len(alerts) > 0:
                 rto.send_alerts(alerts)
 
-            time.sleep(5)
+            time.sleep(600)
