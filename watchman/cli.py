@@ -28,17 +28,18 @@ def cli(config, as_daemon):
         with daemon.DaemonContext():
             run(config)
     else:
+        _stream_handler = logging.StreamHandler()
+        _formatter = logging.Formatter(fmt='[%(asctime)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        _stream_handler.setFormatter(_formatter)
+        _logger.addHandler(_stream_handler)
         run(config)
 
 
 def run(config):
     _handler = logging.FileHandler('/home/michael/logs/watchman.log')
-    _stream_handler = logging.StreamHandler()
     _formatter = logging.Formatter(fmt='[%(asctime)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    _stream_handler.setFormatter(_formatter)
     _handler.setFormatter(_formatter)
     _logger.addHandler(_handler)
-    _logger.addHandler(_stream_handler)
     _logger.setLevel(logging.DEBUG)
 
     _logger.info('Start watchman')
