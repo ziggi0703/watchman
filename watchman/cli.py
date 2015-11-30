@@ -22,7 +22,7 @@ _logger = logging.getLogger()
 
 @click.command()
 @click.option('--as_daemon', '-d', is_flag=True, default=False, help='Start watchman as a daemon.')
-@click.option('--config', '-c', type=str, default=None, help='path to config file')
+@click.option('--config', '-c', type=str, default='/usr/share/watchman_config/default.py', help='path to config file')
 def cli(config, as_daemon):
     if as_daemon:
         with daemon.DaemonContext():
@@ -43,15 +43,9 @@ def run(config):
     _logger.setLevel(logging.INFO)
 
     _logger.info('Start watchman')
-
-    if config is None:
-        _logger.info('Load default config.')
-        with open('/home/michael/PycharmProjects/watchman/watchman/config/default.py', 'r') as config_file:
-            config = eval(config_file.read())
-    else:
-        _logger.info('Load config: {}'.format(config))
-        with open(config) as config_file:
-            config = eval(config_file.read())
+    _logger.info('Load config: {}'.format(config))
+    with open(config) as config_file:
+        config = eval(config_file.read())
 
     _logger.info('Config: {}'.format(config))
     _logger.debug('Start ping guards')
