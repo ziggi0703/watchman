@@ -1,10 +1,15 @@
-{
-    # Hosts which are checked
-    'hosts': ['ekpbelle', 'ekpblus001', 'ekpblus002', 'ekpblus003', 'ekpblus007'],
+#!/usr/bin/env python
+from watchman.squad import PingGuard, QstatFGuard
 
-    # Send the error mail to the admin
-    'admin_mail': 'michael.ziegler2@kit.edu',
+# define your list of guards you want send to watch
+guards = [PingGuard('PingGuard 001', host='ekpblus001'),
+          PingGuard('PingGuard 002', host='ekpblus002'),
+          PingGuard('PingGuard 003', host='ekpblus003'),
+          PingGuard('PingGuard 007', host='ekpblus007'),
+          QstatFGuard('QStatFGuard')]
 
-    # duration between two checks in seconds
-    'sleep': 10
-}
+# EMail address of the admin who will be noticed by errors
+admin_email = 'michael.ziegler2@kit.edu'
+
+# defines the waiting time between two checks (in seconds)
+sleep = 600

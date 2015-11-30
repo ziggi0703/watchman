@@ -24,6 +24,7 @@ _logger = logging.getLogger()
 @click.option('--as_daemon', '-d', is_flag=True, default=False, help='Start watchman as a daemon.')
 @click.option('--config', '-c', type=str, default='/usr/share/watchman_config/default.py', help='path to config file')
 def cli(config, as_daemon):
+    config = __load_config(config)
     if as_daemon:
         with daemon.DaemonContext():
             run(config)
@@ -35,6 +36,12 @@ def cli(config, as_daemon):
         run(config)
 
 
+def __load_config(config):
+    import imp
+    config = imp.load_source('config', config)
+    return config
+
+
 def run(config):
     _handler = logging.FileHandler('/home/michael/logs/watchman.log')
     _formatter = logging.Formatter(fmt='[%(asctime)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -43,29 +50,16 @@ def run(config):
     _logger.setLevel(logging.INFO)
 
     _logger.info('Start watchman')
-    _logger.info('Load config: {}'.format(config))
-    with open(config) as config_file:
-        config = eval(config_file.read())
 
-    _logger.info('Config: {}'.format(config))
-    _logger.debug('Start ping guards')
-    ping_guards = [PingGuard('PingGuard {}'.format(index), host=hostname)
-                   for index, hostname in enumerate(config['hosts'])]
-
-    qstat_f_guard = QstatFGuard('QStatFGuard')
-
-    rto = RadioOperator('RTO1', admin_mail=config['admin_mail'])
+    rto = RadioOperator('RTO1', admin_mail=config.admin_email)
 
     while True:
         alerts = []
-        _logger.debug('PingGuards checking again.')
 
-        for guard in ping_guards:
+        for guard in config.guards:
             guard.guard(alerts)
-
-        qstat_f_guard.guard(alerts)
 
         if len(alerts) > 0:
             rto.send_alerts(alerts)
 
-        time.sleep(config['sleep'])
+        time.sleep(config.sleep)
