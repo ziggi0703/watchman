@@ -1,13 +1,17 @@
 #!/usr/bin/env
+import numpy
 import os
 import subprocess
 
 import datetime
+
+import xmltodict
 from abc import ABCMeta, abstractmethod, abstractproperty
 import logging
 import cStringIO
 from email.mime.text import MIMEText
 import smtplib
+import pandas as pd
 _logger = logging.getLogger(__name__)
 
 
@@ -40,15 +44,21 @@ class Watchman(object):
         """
         _logger.debug('{} starts the watch.'.format(self._name))
         _logger.debug('Check command: {}'.format(self._command))
-        process = subprocess.Popen(self._command, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+        try:
+            process = subprocess.Popen(self._command, stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+        except OSError as e:
+            _logger.warning('{} not available. Skip it and inform admin'.format(self._command))
+            alerts.append((self._name, self._command, -999, 'Command not found.'))
+            return
+
         out, error = process.communicate()
         rc = process.returncode
 
         own_alerts = self._check_output(rc, out, error)
 
         if len(own_alerts) > 0:
-            alerts.append(own_alerts)
+            alerts += own_alerts
         _logger.debug('Watch ends with {} alerts'.format(len(own_alerts)))
 
     @abstractmethod
@@ -103,7 +113,34 @@ class PingGuard(Watchman):
         if return_code == 0:
             return []
         else:
-            return [self._name, self.command, return_code, error]
+            return [(self._name, self.command, return_code, error)]
+
+
+class QstatFGuard(Watchman):
+    """
+    Guard to control the qhost command output
+    """
+    def __init__(self, name):
+        super(QstatFGuard, self).__init__(name)
+        self.command = ['qstat', '-f', '-xml']  # trigger xml output
+
+    def _check_output(self, return_code, out, error):
+        alerts = []
+        dict_from_xml = xmltodict.parse(out)
+        df = pd.DataFrame(dict_from_xml['job_info']['queue_info']['Queue-List'])
+
+        if 'state' in df:
+            error_queues = []
+            states = df['state'].dropna().unique()
+            for state in states:
+                state = str(state)
+                if 'a' in state or 'u' in state:
+                    error_queues += (df[df['state'] == state]['name'].unique().tolist())
+
+            for error_queue in error_queues:
+                alerts.append((self._name, self._command, return_code, 'Queue {} is not available.'.format(error_queue)))
+
+        return alerts
 
 
 class RadioOperator(object):
@@ -141,6 +178,7 @@ class RadioOperator(object):
         message['To'] = self._admin_mail
         message['Subject'] = 'Errors on host {}'.format(self._host)
 
+        print mail.getvalue()
         return message
 
     def send_alerts(self, alerts):

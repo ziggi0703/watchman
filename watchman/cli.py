@@ -10,7 +10,7 @@ import daemon
 import time
 
 from watchman import __version__
-from watchman.squad import PingGuard, RadioOperator
+from watchman.squad import PingGuard, RadioOperator, QstatFGuard
 
 __author__ = "Michael Ziegler"
 __copyright__ = "Michael Ziegler"
@@ -40,7 +40,7 @@ def run(config):
     _formatter = logging.Formatter(fmt='[%(asctime)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     _handler.setFormatter(_formatter)
     _logger.addHandler(_handler)
-    _logger.setLevel(logging.DEBUG)
+    _logger.setLevel(logging.INFO)
 
     _logger.info('Start watchman')
 
@@ -57,12 +57,19 @@ def run(config):
     _logger.debug('Start ping guards')
     ping_guards = [PingGuard('PingGuard {}'.format(index), host=hostname)
                    for index, hostname in enumerate(config['hosts'])]
+
+    qstat_f_guard = QstatFGuard('QStatFGuard')
+
     rto = RadioOperator('RTO1', admin_mail=config['admin_mail'])
+
     while True:
         alerts = []
         _logger.debug('PingGuards checking again.')
+
         for guard in ping_guards:
             guard.guard(alerts)
+
+        qstat_f_guard.guard(alerts)
 
         if len(alerts) > 0:
             rto.send_alerts(alerts)
