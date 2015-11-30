@@ -2,6 +2,9 @@
 from watchman.squad import PingGuard, QstatFGuard
 
 # define your list of guards you want send to watch
+#
+# A PingGuard pings the host and checks the return code of the ping command.
+# The QstatFGuard greps the qstat -f command for some unavailable queues.
 guards = [PingGuard('PingGuard 001', host='ekpblus001'),
           PingGuard('PingGuard 002', host='ekpblus002'),
           PingGuard('PingGuard 003', host='ekpblus003'),
