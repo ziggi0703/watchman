@@ -178,7 +178,6 @@ class RadioOperator(object):
         message['To'] = self._admin_mail
         message['Subject'] = 'Errors on host {}'.format(self._host)
 
-        print mail.getvalue()
         return message
 
     def send_alerts(self, alerts):
