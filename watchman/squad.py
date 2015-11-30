@@ -115,6 +115,34 @@ class RadioOperator(object):
         self._admin_mail = admin_mail
         self._host = os.getenv('HOST') if os.getenv('HOSTNAME') is None else os.getenv('HOSTNAME')
 
+    def _create_message(self, alerts):
+        """
+        Create the message body of the alert email
+
+        :param alerts: list with alerts
+        :type alerts: list
+
+        :return: message with from, to and subject
+        :rtype: MIMEText
+        """
+        _logger.debug('Create message')
+        mail = cStringIO.StringIO()
+        mail.write('Dear Admin,\n\nat {} some errors occured:\n\n'.format(datetime.
+                                                                          datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
+        for alert in alerts:
+            alert_message = 'Guard {} with command {} observed return state {} and error message {}.\n'.format(*alert)
+            mail.write(alert_message)
+
+        mail.write('\n\nPlease take your actions...Over and out.\n')
+
+        message = MIMEText(mail.getvalue())
+        message['From'] = '{}@{}'.format(self._name, self._host)
+        message['To'] = self._admin_mail
+        message['Subject'] = 'Errors on host {}'.format(self._host)
+
+        return message
+
     def send_alerts(self, alerts):
         """
         Send an alerts to the admin via email.
@@ -122,24 +150,8 @@ class RadioOperator(object):
         :param alerts: list of alerts
         :type alerts: list
         """
-        mail = cStringIO.StringIO()
-        mail.write('Dear Admin,\nat {} some errors occured:\n\n'.format(datetime.
-                                                                        datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-
-        for alert in alerts:
-            alert_message = 'Guard {} with command {} observed return state {} and error message {}.\n'.format(*alert)
-            mail.write(alert_message)
-
-        mail.write('\n\nPlease take your actions...\n')
-
-        subject = 'Errors on host {}.'.format(self._host)
-
-        _logger.info('Send alerts to admin {}'.format(self._admin_mail))
-
-        message = MIMEText(mail.getvalue())
-        message['From'] = '{}@{}'.format(self._name, self._host)
-        message['To'] = self._admin_mail
-        message['Subject'] = subject
+        _logger.info('Send alert message to {}'.format(self._admin_mail))
+        message = self._create_message(alerts)
 
         sender = smtplib.SMTP('localhost')
         sender.sendmail(message['From'], message['To'], message.as_string())
