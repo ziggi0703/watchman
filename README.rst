@@ -2,13 +2,13 @@
 watchman
 ========
 
-```watchman``` is a simple package to monitor the OGS cluster in order to make sure, that all 
+``watchman`` is a simple package to monitor the OGS cluster in order to make sure, that all 
 executive hosts are connected.
 
 Description
 ===========
 
-```watchman``` can run as a daemon in the background. If an error is found, an email will be 
+``watchman`` can run as a daemon in the background. If an error is found, an email will be 
 sent to the admin which is defined in the config file. 
 
 
