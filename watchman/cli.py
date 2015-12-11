@@ -53,7 +53,7 @@ def __send_status_report(rto, guards):
     :param guards: list of guards
     :type guards: list
     """
-    reports = '---\n'.join([guard.report_back for guard in guards])
+    reports = '\n\n-----------------\n'.join([guard.report_back() for guard in guards])
     rto.send_status_report(reports)
 
 
@@ -75,7 +75,7 @@ def __start_the_watch(guards, rto):
 
 
 def run(config):
-    _handler = logging.FileHandler('/home/michael/logs/watchman.log')
+    _handler = logging.FileHandler(config.log_file)
     _formatter = logging.Formatter(fmt='[%(asctime)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     _handler.setFormatter(_formatter)
     _logger.addHandler(_handler)

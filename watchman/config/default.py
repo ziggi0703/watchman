@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 from watchman.squad import PingGuard, QstatFGuard
 
+# log to this file
+log_file = '~/watchman.log'
+
 # define your list of guards you want send to watch
 #
 # A PingGuard pings the host and checks the return code of the ping command.
@@ -18,4 +21,4 @@ admin_email = 'admin@host'
 interval = 600
 
 # send a status report to the admin every day at that time:
-status_time = '11:00'
+status_time = '10:00'

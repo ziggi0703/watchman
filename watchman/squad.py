@@ -229,6 +229,9 @@ class RadioOperator(object):
         :type report: str
         """
         _logger.info('Send status report to {}'.format(self._admin_mail))
+
+        report = 'Dear Admin,\n here comes the daily status report:\n\n:' + report
+
         message = MIMEText(report)
         message['From'] = '{}@{}'.format(self._name, self._host)
         message['To'] = self._admin_mail
