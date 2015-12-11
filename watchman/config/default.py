@@ -12,7 +12,7 @@ guards = [PingGuard('PingGuard 001', host='ekpblus001'),
           QstatFGuard('QStatFGuard')]
 
 # EMail address of the admin who will be noticed by errors
-admin_email = 'michael.ziegler2@kit.edu'
+admin_email = 'admin@host'
 
 # defines the waiting time between two checks (in seconds)
 sleep = 600
