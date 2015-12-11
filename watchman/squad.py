@@ -183,8 +183,8 @@ class RadioOperator(object):
         """
         _logger.debug('Create message')
         mail = cStringIO.StringIO()
-        mail.write('Dear Admin,\n\nat {} some errors occured:\n\n'.format(datetime.
-                                                                          datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+        mail.write('Dear Admin,\n\nat {} some errors occurred:\n\n'.format(datetime.
+                                                                           datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
         for alert in alerts:
             alert_message = 'Guard {} with command {} observed return state {} and error message {}.\n'.format(*alert)
