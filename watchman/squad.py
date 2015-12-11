@@ -134,11 +134,11 @@ class QstatFGuard(Watchman):
             states = df['state'].dropna().unique()
             for state in states:
                 state = str(state)
-                if 'a' in state or 'u' in state:
+                if 'a' in state or 'u' in state or 'E' in state:
                     error_queues += (df[df['state'] == state]['name'].unique().tolist())
 
             for error_queue in error_queues:
-                alerts.append((self._name, self._command, return_code, 'Queue {} is not available.'.format(error_queue)))
+                alerts.append((self._name, self._command, return_code, 'Queue {} is not available or set to ERROR.'.format(error_queue)))
 
         return alerts
 
