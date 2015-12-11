@@ -61,6 +61,25 @@ class Watchman(object):
             alerts += own_alerts
         _logger.debug('Watch ends with {} alerts'.format(len(own_alerts)))
 
+    def report_back(self):
+        """
+        Report back: execute the command and return the output of the command.
+
+        :return: output of the command
+        :rtype: str
+        """
+        _logger.info('Report from {} with command {}.'.format(self._name, self._command))
+        process = subprocess.Popen(self._command, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+
+        out, error = process.communicate()
+
+        rv = '{} reports on command {}:\n'.format(self._name, self._command)
+        rv = rv + 'stdout:\n{}\n'.format(out) + \
+             'stderr:\n{}\n'.format(error) + \
+             'Return code: {}'.format(process.returncode)
+        return rv
+
     @abstractmethod
     def _check_output(self, return_code, out, error):
         """
@@ -190,6 +209,31 @@ class RadioOperator(object):
         _logger.info('Send alert message to {}'.format(self._admin_mail))
         message = self._create_message(alerts)
 
+        self._send_mail(message)
+
+    def _send_mail(self, message):
+        """
+        Send the mail
+        :param message: actual message
+        :type message: MIMEText
+        """
         sender = smtplib.SMTP('localhost')
         sender.sendmail(message['From'], message['To'], message.as_string())
         sender.quit()
+
+    def send_status_report(self, report):
+        """
+        Send the status report to the admin
+
+        :param report: Some message which is send to the admin
+        :type report: str
+        """
+        _logger.info('Send status report to {}'.format(self._admin_mail))
+        message = MIMEText(report)
+        message['From'] = '{}@{}'.format(self._name, self._host)
+        message['To'] = self._admin_mail
+        message['Subject'] = 'Status report from host {}'.format(self._host)
+
+        self._send_mail(message)
+
+

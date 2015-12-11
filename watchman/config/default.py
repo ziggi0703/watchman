@@ -15,4 +15,7 @@ guards = [PingGuard('PingGuard 001', host='ekpblus001'),
 admin_email = 'admin@host'
 
 # defines the waiting time between two checks (in seconds)
-sleep = 600
+interval = 600
+
+# send a status report to the admin every day at that time:
+status_time = '11:00'

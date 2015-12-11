@@ -3,3 +3,4 @@ click
 xmltodict
 pandas
 python-daemon
+schedule
