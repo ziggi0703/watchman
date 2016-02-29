@@ -14,6 +14,9 @@ guards = [PingGuard('PingGuard 001', host='ekpblus001'),
           PingGuard('PingGuard 007', host='ekpblus007'),
           QstatFGuard('QStatFGuard')]
 
+# EMail address FROM
+from_email = 'root@example.com'
+
 # EMail address of the admin who will be noticed by errors
 admin_email = 'admin@host'
 

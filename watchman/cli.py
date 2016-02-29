@@ -83,7 +83,7 @@ def run(config):
 
     _logger.info('Start watchman')
 
-    rto = RadioOperator('RTO1', admin_mail=config.admin_email)
+    rto = RadioOperator('RTO1', from_mail=config.from_mail, admin_mail=config.admin_email)
 
     schedule.every(config.interval).seconds.do(__start_the_watch, config.guards, rto)
     schedule.every().day.at(config.status_time).do(__send_status_report, rto, config.guards)

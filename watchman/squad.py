@@ -165,9 +165,19 @@ class QstatFGuard(Watchman):
 class RadioOperator(object):
     """
     A RadioOperator sends the alert given by a Watchman via email to the admin.
+
+    :param name: Name of the Instance
+    :type name: str
+
+    :param from_mail: Address from which the mails are send
+    :type from_mail: str
+
+    :param admin_mail: Address of the admin
+    :type admin_mail: str
     """
-    def __init__(self, name, admin_mail):
+    def __init__(self, name, from_mail, admin_mail):
         self._name = name
+        self._from_mail = from_mail
         self._admin_mail = admin_mail
         self._host = os.getenv('HOST') if os.getenv('HOSTNAME') is None else os.getenv('HOSTNAME')
 
@@ -193,7 +203,7 @@ class RadioOperator(object):
         mail.write('\n\nPlease take your actions...Over and out.\n')
 
         message = MIMEText(mail.getvalue())
-        message['From'] = '{}@{}'.format(self._name, self._host)
+        message['From'] = self._from_mail
         message['To'] = self._admin_mail
         message['Subject'] = 'Errors on host {}'.format(self._host)
 
