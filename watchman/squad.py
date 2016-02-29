@@ -243,7 +243,7 @@ class RadioOperator(object):
         report = 'Dear Admin,\n here comes the daily status report:\n\n:' + report
 
         message = MIMEText(report)
-        message['From'] = '{}@{}'.format(self._name, self._host)
+        message['From'] = self._from_mail
         message['To'] = self._admin_mail
         message['Subject'] = 'Status report from host {}'.format(self._host)
 
