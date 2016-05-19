@@ -178,7 +178,11 @@ class RadioOperator(object):
     def __init__(self, name, from_mail, admin_mail):
         self._name = name
         self._from_mail = from_mail
-        self._admin_mail = admin_mail
+
+        if isinstance(admin_mail, str):
+            self._admin_mail = [admin_mail]
+        else:
+            self._admin_mail = admin_mail
         self._host = os.getenv('HOST') if os.getenv('HOSTNAME') is None else os.getenv('HOSTNAME')
 
     def _create_message(self, alerts):
@@ -204,7 +208,7 @@ class RadioOperator(object):
 
         message = MIMEText(mail.getvalue())
         message['From'] = self._from_mail
-        message['To'] = self._admin_mail
+        message['To'] = self._get_admin_address()
         message['Subject'] = 'Errors on host {}'.format(self._host)
 
         return message
@@ -228,8 +232,21 @@ class RadioOperator(object):
         :type message: MIMEText
         """
         sender = smtplib.SMTP('localhost')
-        sender.sendmail(message['From'], message['To'], message.as_string())
+        sender.sendmail(message['From'], self._admin_mail, message.as_string())
         sender.quit()
+
+    def _get_admin_address(self):
+        """
+        Get the admin mail address as a string.
+        If multiple mails exist, they will be combined to one string separated by a comma.
+
+        :return: mail addresses prepared for message
+        :rtype: str
+        """
+        if len(self._admin_mail) > 1:
+            return ','.join(self._admin_mail)
+        else:
+            return self._admin_mail[0]
 
     def send_status_report(self, report):
         """
@@ -244,7 +261,7 @@ class RadioOperator(object):
 
         message = MIMEText(report)
         message['From'] = self._from_mail
-        message['To'] = self._admin_mail
+        message['To'] = self._get_admin_address()
         message['Subject'] = 'Status report from host {}'.format(self._host)
 
         self._send_mail(message)
